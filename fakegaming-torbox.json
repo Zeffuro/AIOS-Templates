@@ -2,11 +2,11 @@
   {
     "metadata": {
       "id": "zeffuro.fakegaming-torbox",
-      "name": "Fakegaming TorBox Setup",
-      "description": "Friends-and-family TorBox setup based on Tam-Taro's Complete SEL Setup. TMDB and TVDB are supplied by this AIOStreams instance. Each user supplies their own TorBox account. Torrentio is omitted because it blocks this server's outbound IP range.",
+      "name": "Fakegaming TorBox (Balanced)",
+      "description": "Friends-and-family TorBox setup based on Tam-Taro's Complete SEL Setup. It uses server-supplied TMDB/TVDB credentials, each user supplies their own TorBox account, Torrentio is omitted, and dynamic fetching avoids waiting for unhealthy fallback providers when enough results are already available.",
       "source": "external",
       "author": "TamTaro",
-      "version": "3.0.401",
+      "version": "3.0.402",
       "category": "TorBox",
       "serviceRequired": true,
       "inputs": [
@@ -1024,11 +1024,11 @@
             {
               "id": "timeout",
               "name": "Global Timeout",
-              "description": "Enter the time in ms you're willing to wait for results before your add-ons timeout. Default: 5000 ms.",
+              "description": "Maximum time per add-on request. The balanced default is 3500 ms; dynamic fetching normally returns popular titles much sooner.",
               "type": "number",
               "required": false,
               "advanced": true,
-              "default": 5000
+              "default": 3500
             },
             {
               "id": "noAnime",
@@ -3182,8 +3182,8 @@
       "dynamicAddonFetching": {
         "__if": "inputs.addonPreset == default",
         "__value": {
-          "enabled": false,
-          "condition": ""
+          "enabled": true,
+          "condition": "(count(cached(totalStreams)) > 9 and totalTimeTaken > 1100) or totalTimeTaken > 3200"
         }
       },
       "groups": {
@@ -3779,149 +3779,242 @@
       "precacheSelector": "count(cached(streams)) == 0 ? uncached(streams) : []",
       "presets": {
         "__if": "inputs.addonPreset == default",
-        "__value": {
-          "__switch": "services",
-          "cases": {
-            "": [
-              {
-                "type": "meteor",
-                "instanceId": "064",
-                "enabled": true,
-                "options": {
-                  "name": "Meteor",
-                  "timeout": "{{inputs.includeAddon.timeout}}",
-                  "resources": [
-                    "stream"
-                  ],
-                  "includeP2P": true,
-                  "removeTrash": false,
-                  "useMultipleInstances": false,
-                  "mediaTypes": []
+        "__value": [
+          {
+            "__if": "!inputs.includeAddon.noAnime",
+            "type": "seadex",
+            "instanceId": "326",
+            "enabled": true,
+            "options": {
+              "name": "SeaDex",
+              "timeout": "{{inputs.includeAddon.timeout}}",
+              "mediaTypes": [
+                "anime"
+              ]
+            },
+            "category": "Debrid"
+          },
+          {
+            "type": "library",
+            "instanceId": "ae7",
+            "enabled": true,
+            "options": {
+              "name": "Library",
+              "timeout": "{{inputs.includeAddon.timeout}}",
+              "resources": [
+                "stream",
+                "catalog",
+                "meta"
+              ],
+              "mediaTypes": [],
+              "showRefreshActions": [
+                "catalog"
+              ],
+              "skipProcessing": false,
+              "hideStreams": false,
+              "useMultipleInstances": false
+            },
+            "category": "Debrid"
+          },
+          {
+            "__if": "!inputs.includeAddon.noAnime",
+            "type": "neko-bt",
+            "instanceId": "072",
+            "enabled": true,
+            "options": {
+              "name": "nekoBT",
+              "timeout": "{{inputs.includeAddon.timeout}}",
+              "mediaTypes": [
+                "anime"
+              ],
+              "useMultipleInstances": false
+            },
+            "category": "Debrid"
+          },
+          {
+            "type": "torznab",
+            "instanceId": "6a6",
+            "enabled": true,
+            "options": {
+              "name": "ComeTorz",
+              "torznabUrl": "https://comet.feels.legal/torznab/",
+              "apiPath": "/api",
+              "timeout": "{{inputs.includeAddon.timeout}}",
+              "mediaTypes": [],
+              "searchMode": "auto",
+              "seasonEpisodeStrategy": "dynamic",
+              "paginate": false,
+              "useMultipleInstances": false
+            },
+            "category": "Debrid"
+          },
+          {
+            "type": "stremthruTorz",
+            "instanceId": "609",
+            "enabled": true,
+            "options": {
+              "name": "STorz",
+              "timeout": "{{inputs.includeAddon.timeout}}",
+              "resources": [
+                "stream"
+              ],
+              "url": "",
+              "mediaTypes": [],
+              "includeP2P": false,
+              "useMultipleInstances": false
+            },
+            "category": "Debrid"
+          },
+          {
+            "type": "meteor",
+            "instanceId": "ddd",
+            "enabled": true,
+            "options": {
+              "name": "Meteor",
+              "timeout": "{{inputs.includeAddon.timeout}}",
+              "resources": [
+                "stream"
+              ],
+              "includeP2P": false,
+              "removeTrash": false,
+              "useMultipleInstances": false,
+              "mediaTypes": [],
+              "yourMedia": {
+                "__switch": "inputs.torboxTier",
+                "cases": {
+                  "pro": {
+                    "sources": [
+                      "torrent",
+                      "webdl",
+                      "usenet"
+                    ],
+                    "showStreams": true,
+                    "enabled": true
+                  },
+                  "nonPro": {
+                    "sources": [
+                      "torrent",
+                      "webdl"
+                    ],
+                    "showStreams": true,
+                    "enabled": true
+                  }
                 },
-                "category": "P2P"
-              },
-              {
-                "type": "comet",
-                "instanceId": "b0f",
-                "enabled": true,
-                "options": {
-                  "name": "Comet",
-                  "timeout": "{{inputs.includeAddon.timeout}}",
-                  "resources": [
-                    "stream"
+                "default": {
+                  "sources": [
+                    "torrent",
+                    "webdl"
                   ],
-                  "includeP2P": true,
-                  "removeTrash": false,
-                  "mediaTypes": [],
-                  "url": ""
+                  "showStreams": true,
+                  "enabled": true
+                }
+              },
+              "usenet": {
+                "__switch": "inputs.torboxTier",
+                "cases": {
+                  "pro": {
+                    "enabled": false,
+                    "customSearchEngines": false
+                  },
+                  "nonPro": {
+                    "enabled": false,
+                    "customSearchEngines": false
+                  }
                 },
-                "category": "P2P"
+                "default": {
+                  "enabled": false,
+                  "customSearchEngines": false
+                }
+              }
+            },
+            "category": {
+              "__switch": "inputs.torboxTier",
+              "cases": {
+                "pro": "Debrid",
+                "nonPro": "Debrid"
               },
-              {
-                "type": "stremthruTorz",
-                "instanceId": "bb9",
-                "enabled": true,
-                "options": {
-                  "name": "STorz",
-                  "timeout": "{{inputs.includeAddon.timeout}}",
-                  "resources": [
-                    "stream"
-                  ],
-                  "mediaTypes": [],
-                  "includeP2P": true,
-                  "useMultipleInstances": false,
-                  "url": ""
-                },
-                "category": "P2P"
-              },
-              {
-                "type": "mediafusion",
-                "instanceId": "276",
-                "enabled": true,
-                "options": {
-                  "name": "MediaFusion",
-                  "timeout": "{{inputs.includeAddon.timeout}}",
-                  "resources": [
-                    "stream"
-                  ],
-                  "useCachedResultsOnly": true,
-                  "enableWatchlistCatalogs": false,
-                  "downloadViaBrowser": false,
-                  "contributorStreams": false,
-                  "certificationLevelsFilter": [],
-                  "nudityFilter": [],
-                  "mediaTypes": [],
-                  "url": ""
-                },
-                "category": "P2P"
-              },
-              {
-                "type": "torrents-db",
-                "instanceId": "a15",
-                "enabled": true,
-                "options": {
-                  "name": "TorrentsDB",
-                  "timeout": "{{inputs.includeAddon.timeout}}",
-                  "resources": [
-                    "stream"
-                  ],
-                  "mediaTypes": [],
-                  "providers": [
-                    "yts",
-                    "1337x",
-                    "torrentcsv",
-                    "1lou",
-                    "nyaa",
-                    "sktorrent",
-                    "1tamilblasters",
-                    "limetorrent",
-                    "1tamilmv",
-                    "rargb",
-                    "knaben",
-                    "thepiratebay",
-                    "kickasstorrents",
-                    "animetosho",
-                    "extremlymtorrents",
-                    "yggtorrent",
-                    "tokyotosho",
-                    "rutor",
-                    "rutracker",
-                    "torrent9",
-                    "ilcorsaronero",
-                    "manual"
-                  ],
-                  "includeP2P": true,
-                  "useMultipleInstances": false
-                },
-                "category": "P2P"
-              },
-              {
-                "type": "peerflix",
-                "instanceId": "8b6",
-                "enabled": true,
-                "options": {
-                  "name": "Peerflix",
-                  "timeout": "{{inputs.includeAddon.timeout}}",
-                  "resources": [
-                    "stream"
-                  ],
-                  "mediaTypes": [],
-                  "useMultipleInstances": false,
-                  "showTorrentLinks": true
-                },
-                "category": "P2P"
-              },
-              {
-                "type": "sootio",
-                "instanceId": "9d3",
-                "enabled": true,
-                "options": {
-                  "name": "Sootio",
-                  "timeout": "{{inputs.includeAddon.timeout}}",
-                  "resources": [
-                    "stream"
-                  ],
-                  "httpProviders": [
+              "default": "Debrid"
+            }
+          },
+          {
+            "type": "knaben",
+            "instanceId": "dc9",
+            "enabled": true,
+            "options": {
+              "name": "Knaben",
+              "timeout": "{{inputs.includeAddon.timeout}}",
+              "mediaTypes": [],
+              "useMultipleInstances": false
+            },
+            "category": "Debrid"
+          },
+          {
+            "__if": "inputs.includeAddon.debridio",
+            "type": "debridio",
+            "instanceId": "911",
+            "enabled": true,
+            "options": {
+              "name": "Debridio",
+              "timeout": "{{inputs.includeAddon.timeout}}",
+              "debridioApiKey": "<template_placeholder>"
+            },
+            "category": "Debrid"
+          },
+          {
+            "type": "mediafusion",
+            "instanceId": "276",
+            "enabled": true,
+            "options": {
+              "name": "MediaFusion",
+              "timeout": "{{inputs.includeAddon.timeout}}",
+              "resources": [
+                "stream"
+              ],
+              "useCachedResultsOnly": false,
+              "enableWatchlistCatalogs": false,
+              "downloadViaBrowser": false,
+              "contributorStreams": false,
+              "certificationLevelsFilter": [],
+              "nudityFilter": [],
+              "mediaTypes": [],
+              "url": ""
+            },
+            "category": "Debrid"
+          },
+          {
+            "__if": "services.easynews",
+            "type": "easynews-search",
+            "instanceId": "60d",
+            "enabled": true,
+            "options": {
+              "name": "ENS",
+              "timeout": "{{inputs.includeAddon.timeout}}",
+              "mediaTypes": [],
+              "services": [
+                "easynews"
+              ],
+              "aiostreamsAuth": "",
+              "paginate": true,
+              "useMultipleInstances": false,
+              "apiVersion": "3.0"
+            },
+            "category": "Usenet"
+          },
+          {
+            "__if": "inputs.includeAddon.httpAddons",
+            "type": "sootio",
+            "instanceId": "30b",
+            "enabled": true,
+            "options": {
+              "name": "Sootio",
+              "timeout": 1800,
+              "resources": [
+                "stream"
+              ],
+              "httpProviders": [
+                {
+                  "__if": "inputs.includeAddon.httpAddons",
+                  "__value": [
                     "http4khdhub",
                     "httpHDHub4u",
                     "httpUHDMovies",
@@ -3932,486 +4025,173 @@
                     "httpCineDoze",
                     "httpNetflixMirror",
                     "httpVixSrc"
-                  ],
-                  "mediaTypes": [],
-                  "useMultipleInstances": false,
-                  "url": "https://sooti.info"
-                },
-                "category": "HTTP"
-              },
-              {
-                "type": "webstreamr",
-                "instanceId": "645",
-                "enabled": true,
-                "options": {
-                  "name": "WebStreamr",
-                  "timeout": "{{inputs.includeAddon.timeout}}",
-                  "resources": [
-                    "stream"
-                  ],
-                  "mediaTypes": [],
-                  "providers": [
-                    "multi",
-                    "en",
-                    "de",
-                    "es",
-                    "fr",
-                    "hi",
-                    "it",
-                    "mx"
-                  ],
-                  "url": "https://87d6a6ef6b58-webstreamrmbg.baby-beamup.club",
-                  "includeExternalUrls": false,
-                  "showErrors": false
-                },
-                "category": "HTTP"
-              },
-              {
-                "type": "hdhub",
-                "instanceId": "29a",
-                "enabled": true,
-                "options": {
-                  "name": "HdHub",
-                  "timeout": "{{inputs.includeAddon.timeout}}",
-                  "resources": [
-                    "stream"
-                  ],
-                  "mediaTypes": [],
-                  "tb_only": false
-                },
-                "category": "HTTP"
-              },
-              {
-                "__if": "inputs.includeAddon.kdramaAddons",
-                "type": "yastream",
-                "instanceId": "28f",
-                "enabled": true,
-                "options": {
-                  "name": "yastream",
-                  "timeout": "{{inputs.includeAddon.timeout}}",
-                  "resources": [
-                    "stream",
-                    "subtitles",
-                    "meta",
-                    "catalog"
-                  ],
-                  "kisskhCatalogs": [
-                    "kisskh.series.Korean",
-                    "kisskh.movie.Korean"
-                  ],
-                  "onetouchtvCatalogs": [],
-                  "kisskhStream": true,
-                  "onetouchtvStream": true,
-                  "idramaStream": false,
-                  "kkphimStream": false,
-                  "ophimStream": false,
-                  "nsfw": false,
-                  "info": false,
-                  "poster": "rpdb",
-                  "url": ""
-                },
-                "category": "HTTP"
-              },
-              {
-                "__if": "inputs.includeAddon.subtitleLanguages != disabled",
-                "type": "opensubtitles-v3-plus",
-                "instanceId": "262",
-                "enabled": true,
-                "options": {
-                  "name": "OpenSubtitles V3+",
-                  "timeout": "{{inputs.includeAddon.timeout}}",
-                  "resources": [
-                    "subtitles"
-                  ],
-                  "language": "{{inputs.includeAddon.subtitleLanguages}}",
-                  "sources": "all",
-                  "includeAiTranslated": false,
-                  "movieHashPlusAutoAdjustment": false
-                },
-                "category": "Subs"
-              }
-            ]
-          },
-          "default": [
-            {
-              "__if": "!inputs.includeAddon.noAnime",
-              "type": "seadex",
-              "instanceId": "326",
-              "enabled": true,
-              "options": {
-                "name": "SeaDex",
-                "timeout": "{{inputs.includeAddon.timeout}}",
-                "mediaTypes": [
-                  "anime"
-                ]
-              },
-              "category": "Debrid"
-            },
-            {
-              "type": "library",
-              "instanceId": "ae7",
-              "enabled": true,
-              "options": {
-                "name": "Library",
-                "timeout": "{{inputs.includeAddon.timeout}}",
-                "resources": [
-                  "stream",
-                  "catalog",
-                  "meta"
-                ],
-                "mediaTypes": [],
-                "showRefreshActions": [
-                  "catalog"
-                ],
-                "skipProcessing": false,
-                "hideStreams": false,
-                "useMultipleInstances": false
-              },
-              "category": "Debrid"
-            },
-            {
-              "__if": "!inputs.includeAddon.noAnime",
-              "type": "neko-bt",
-              "instanceId": "072",
-              "enabled": true,
-              "options": {
-                "name": "nekoBT",
-                "timeout": "{{inputs.includeAddon.timeout}}",
-                "mediaTypes": [
-                  "anime"
-                ],
-                "useMultipleInstances": false
-              },
-              "category": "Debrid"
-            },
-            {
-              "type": "torznab",
-              "instanceId": "6a6",
-              "enabled": true,
-              "options": {
-                "name": "ComeTorz",
-                "torznabUrl": "https://comet.feels.legal/torznab/",
-                "apiPath": "/api",
-                "timeout": "{{inputs.includeAddon.timeout}}",
-                "mediaTypes": [],
-                "searchMode": "auto",
-                "seasonEpisodeStrategy": "dynamic",
-                "paginate": false,
-                "useMultipleInstances": false
-              },
-              "category": "Debrid"
-            },
-            {
-              "type": "stremthruTorz",
-              "instanceId": "609",
-              "enabled": true,
-              "options": {
-                "name": "STorz",
-                "timeout": "{{inputs.includeAddon.timeout}}",
-                "resources": [
-                  "stream"
-                ],
-                "url": "",
-                "mediaTypes": [],
-                "includeP2P": false,
-                "useMultipleInstances": false
-              },
-              "category": "Debrid"
-            },
-            {
-              "type": "meteor",
-              "instanceId": "ddd",
-              "enabled": true,
-              "options": {
-                "name": "Meteor",
-                "timeout": "{{inputs.includeAddon.timeout}}",
-                "resources": [
-                  "stream"
-                ],
-                "includeP2P": false,
-                "removeTrash": false,
-                "useMultipleInstances": false,
-                "mediaTypes": [],
-                "yourMedia": {
-                  "__switch": "inputs.torboxTier",
-                  "cases": {
-                    "pro": {
-                      "sources": [
-                        "torrent",
-                        "webdl",
-                        "usenet"
-                      ],
-                      "showStreams": true,
-                      "enabled": true
-                    },
-                    "nonPro": {
-                      "sources": [
-                        "torrent",
-                        "webdl"
-                      ],
-                      "showStreams": true,
-                      "enabled": true
-                    }
-                  },
-                  "default": {
-                    "sources": [
-                      "torrent",
-                      "webdl"
-                    ],
-                    "showStreams": true,
-                    "enabled": true
-                  }
-                },
-                "usenet": {
-                  "__switch": "inputs.torboxTier",
-                  "cases": {
-                    "pro": {
-                      "enabled": false,
-                      "customSearchEngines": false
-                    },
-                    "nonPro": {
-                      "enabled": false,
-                      "customSearchEngines": false
-                    }
-                  },
-                  "default": {
-                    "enabled": false,
-                    "customSearchEngines": false
-                  }
+                  ]
                 }
-              },
-              "category": {
-                "__switch": "inputs.torboxTier",
-                "cases": {
-                  "pro": "Debrid",
-                  "nonPro": "Debrid"
-                },
-                "default": "Debrid"
-              }
+              ],
+              "mediaTypes": [],
+              "useMultipleInstances": false
             },
-            {
-              "type": "knaben",
-              "instanceId": "dc9",
-              "enabled": true,
-              "options": {
-                "name": "Knaben",
-                "timeout": "{{inputs.includeAddon.timeout}}",
-                "mediaTypes": [],
-                "useMultipleInstances": false
+            "category": {
+              "__switch": "inputs.includeAddon.httpAddons",
+              "cases": {
+                "true": "Mix",
+                "false": "Debrid"
               },
-              "category": "Debrid"
-            },
-            {
-              "__if": "inputs.includeAddon.debridio",
-              "type": "debridio",
-              "instanceId": "911",
-              "enabled": true,
-              "options": {
-                "name": "Debridio",
-                "timeout": "{{inputs.includeAddon.timeout}}",
-                "debridioApiKey": "<template_placeholder>"
-              },
-              "category": "Debrid"
-            },
-            {
-              "type": "mediafusion",
-              "instanceId": "276",
-              "enabled": true,
-              "options": {
-                "name": "MediaFusion",
-                "timeout": "{{inputs.includeAddon.timeout}}",
-                "resources": [
-                  "stream"
-                ],
-                "useCachedResultsOnly": false,
-                "enableWatchlistCatalogs": false,
-                "downloadViaBrowser": false,
-                "contributorStreams": false,
-                "certificationLevelsFilter": [],
-                "nudityFilter": [],
-                "mediaTypes": [],
-                "url": ""
-              },
-              "category": "Debrid"
-            },
-            {
-              "__if": "services.easynews",
-              "type": "easynews-search",
-              "instanceId": "60d",
-              "enabled": true,
-              "options": {
-                "name": "ENS",
-                "timeout": "{{inputs.includeAddon.timeout}}",
-                "mediaTypes": [],
-                "services": [
-                  "easynews"
-                ],
-                "aiostreamsAuth": "",
-                "paginate": true,
-                "useMultipleInstances": false,
-                "apiVersion": "3.0"
-              },
-              "category": "Usenet"
-            },
-            {
-              "__if": "inputs.includeAddon.httpAddons",
-              "type": "sootio",
-              "instanceId": "30b",
-              "enabled": true,
-              "options": {
-                "name": "Sootio",
-                "timeout": "{{inputs.includeAddon.timeout}}",
-                "resources": [
-                  "stream"
-                ],
-                "httpProviders": [
-                  {
-                    "__if": "inputs.includeAddon.httpAddons",
-                    "__value": [
-                      "http4khdhub",
-                      "httpHDHub4u",
-                      "httpUHDMovies",
-                      "httpMoviesDrive",
-                      "httpMKVCinemas",
-                      "httpMkvDrama",
-                      "httpMalluMv",
-                      "httpCineDoze",
-                      "httpNetflixMirror",
-                      "httpVixSrc"
-                    ]
-                  }
-                ],
-                "mediaTypes": [],
-                "useMultipleInstances": false
-              },
-              "category": {
-                "__switch": "inputs.includeAddon.httpAddons",
-                "cases": {
-                  "true": "Mix",
-                  "false": "Debrid"
-                },
-                "default": "Debrid"
-              }
-            },
-            {
-              "__if": "inputs.includeAddon.debridio and inputs.includeAddon.httpAddons",
-              "type": "debridio-watchtower",
-              "instanceId": "79c",
-              "enabled": true,
-              "options": {
-                "name": "Watchtower",
-                "timeout": "{{inputs.includeAddon.timeout}}",
-                "resources": [
-                  "stream"
-                ],
-                "url": "",
-                "debridioApiKey": "<template_placeholder>",
-                "mediaTypes": []
-              },
-              "category": "HTTP"
-            },
-            {
-              "__if": "inputs.includeAddon.httpAddons",
-              "type": "webstreamr",
-              "instanceId": "645",
-              "enabled": true,
-              "options": {
-                "name": "WebStreamr",
-                "timeout": "{{inputs.includeAddon.timeout}}",
-                "resources": [
-                  "stream"
-                ],
-                "mediaTypes": [],
-                "providers": [
-                  "multi",
-                  "en",
-                  "de",
-                  "es",
-                  "fr",
-                  "hi",
-                  "it",
-                  "mx"
-                ],
-                "url": "https://87d6a6ef6b58-webstreamrmbg.baby-beamup.club",
-                "includeExternalUrls": false,
-                "showErrors": false
-              },
-              "category": "HTTP"
-            },
-            {
-              "__if": "inputs.includeAddon.httpAddons",
-              "type": "hdhub",
-              "instanceId": "29a",
-              "enabled": true,
-              "options": {
-                "name": "HdHub",
-                "timeout": "{{inputs.includeAddon.timeout}}",
-                "resources": [
-                  "stream"
-                ],
-                "mediaTypes": [],
-                "tb_only": false
-              },
-              "category": {
-                "__switch": "services.torbox",
-                "cases": {
-                  "true": "Mix",
-                  "false": "HTTP"
-                },
-                "default": "HTTP"
-              }
-            },
-            {
-              "__if": "inputs.includeAddon.kdramaAddons",
-              "type": "yastream",
-              "instanceId": "28f",
-              "enabled": true,
-              "options": {
-                "name": "yastream",
-                "timeout": "{{inputs.includeAddon.timeout}}",
-                "resources": [
-                  "stream",
-                  "subtitles",
-                  "meta",
-                  "catalog"
-                ],
-                "kisskhCatalogs": [
-                  "kisskh.series.Korean",
-                  "kisskh.movie.Korean"
-                ],
-                "onetouchtvCatalogs": [],
-                "kisskhStream": true,
-                "onetouchtvStream": true,
-                "idramaStream": false,
-                "kkphimStream": false,
-                "ophimStream": false,
-                "nsfw": false,
-                "info": false,
-                "poster": "rpdb",
-                "url": ""
-              },
-              "category": "HTTP"
-            },
-            {
-              "__if": "inputs.includeAddon.subtitleLanguages != disabled",
-              "type": "opensubtitles-v3-plus",
-              "instanceId": "262",
-              "enabled": true,
-              "options": {
-                "name": "OpenSubtitles V3+",
-                "timeout": "{{inputs.includeAddon.timeout}}",
-                "resources": [
-                  "subtitles"
-                ],
-                "language": "{{inputs.includeAddon.subtitleLanguages}}",
-                "sources": "all",
-                "includeAiTranslated": false,
-                "movieHashPlusAutoAdjustment": false
-              },
-              "category": "Subs"
+              "default": "Debrid"
             }
-          ]
-        }
+          },
+          {
+            "__if": "inputs.includeAddon.debridio and inputs.includeAddon.httpAddons",
+            "type": "debridio-watchtower",
+            "instanceId": "79c",
+            "enabled": true,
+            "options": {
+              "name": "Watchtower",
+              "timeout": "{{inputs.includeAddon.timeout}}",
+              "resources": [
+                "stream"
+              ],
+              "url": "",
+              "debridioApiKey": "<template_placeholder>",
+              "mediaTypes": []
+            },
+            "category": "HTTP"
+          },
+          {
+            "__if": "inputs.includeAddon.httpAddons",
+            "type": "webstreamr",
+            "instanceId": "645",
+            "enabled": true,
+            "options": {
+              "name": "WebStreamr",
+              "timeout": 1800,
+              "resources": [
+                "stream"
+              ],
+              "mediaTypes": [],
+              "providers": [
+                "multi",
+                "en",
+                "de",
+                "es",
+                "fr",
+                "hi",
+                "it",
+                "mx"
+              ],
+              "url": "https://87d6a6ef6b58-webstreamrmbg.baby-beamup.club",
+              "includeExternalUrls": false,
+              "showErrors": false
+            },
+            "category": "HTTP"
+          },
+          {
+            "__if": "inputs.includeAddon.kdramaAddons",
+            "type": "yastream",
+            "instanceId": "28f",
+            "enabled": true,
+            "options": {
+              "name": "yastream",
+              "timeout": "{{inputs.includeAddon.timeout}}",
+              "resources": [
+                "stream",
+                "subtitles",
+                "meta",
+                "catalog"
+              ],
+              "kisskhCatalogs": [
+                "kisskh.series.Korean",
+                "kisskh.movie.Korean"
+              ],
+              "onetouchtvCatalogs": [],
+              "kisskhStream": true,
+              "onetouchtvStream": true,
+              "idramaStream": false,
+              "kkphimStream": false,
+              "ophimStream": false,
+              "nsfw": false,
+              "info": false,
+              "poster": "rpdb",
+              "url": ""
+            },
+            "category": "HTTP"
+          },
+          {
+            "__if": "inputs.includeAddon.subtitleLanguages != disabled",
+            "type": "opensubtitles-v3-plus",
+            "instanceId": "262",
+            "enabled": true,
+            "options": {
+              "name": "OpenSubtitles V3+",
+              "timeout": "{{inputs.includeAddon.timeout}}",
+              "resources": [
+                "subtitles"
+              ],
+              "language": "{{inputs.includeAddon.subtitleLanguages}}",
+              "sources": "all",
+              "includeAiTranslated": false,
+              "movieHashPlusAutoAdjustment": false
+            },
+            "category": "Subs"
+          },
+          {
+            "type": "comet",
+            "instanceId": "b0f",
+            "enabled": true,
+            "options": {
+              "name": "Comet",
+              "timeout": "{{inputs.includeAddon.timeout}}",
+              "resources": [
+                "stream"
+              ],
+              "includeP2P": false,
+              "removeTrash": false,
+              "mediaTypes": [],
+              "url": ""
+            },
+            "category": "Debrid"
+          },
+          {
+            "type": "torrents-db",
+            "instanceId": "a15",
+            "enabled": true,
+            "options": {
+              "name": "TorrentsDB",
+              "timeout": "{{inputs.includeAddon.timeout}}",
+              "resources": [
+                "stream"
+              ],
+              "mediaTypes": [],
+              "providers": [
+                "yts",
+                "1337x",
+                "torrentcsv",
+                "1lou",
+                "nyaa",
+                "sktorrent",
+                "1tamilblasters",
+                "limetorrent",
+                "1tamilmv",
+                "rargb",
+                "knaben",
+                "thepiratebay",
+                "kickasstorrents",
+                "animetosho",
+                "extremlymtorrents",
+                "yggtorrent",
+                "tokyotosho",
+                "rutor",
+                "rutracker",
+                "torrent9",
+                "ilcorsaronero",
+                "manual"
+              ],
+              "includeP2P": false,
+              "useMultipleInstances": false
+            },
+            "category": "Debrid"
+          }
+        ]
       },
       "addonCategoryColors": {
         "__if": "inputs.addonPreset == default",
