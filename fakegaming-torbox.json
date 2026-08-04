@@ -6,7 +6,7 @@
       "description": "Friends-and-family TorBox configuration based on Tam-Taro's Complete SEL Setup. TMDB and TVDB are supplied by this AIOStreams instance; each user provides only their own TorBox account.",
       "source": "external",
       "author": "TamTaro",
-      "version": "3.0.4+fg.1",
+      "version": "3.0.4",
       "category": "TorBox",
       "serviceRequired": true,
       "inputs": [
