@@ -76,7 +76,7 @@ def main() -> None:
                 "TorBox account."
             ),
             "author": "TamTaro",
-            "version": f"{upstream_version}-fg.{CUSTOM_REVISION}",
+            "version": f"{upstream_version}+fg.{CUSTOM_REVISION}",
             "source": "external",
             "sourceUrl": OUTPUT_RAW_URL,
             "category": "TorBox",
