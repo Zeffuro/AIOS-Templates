@@ -3,10 +3,10 @@
     "metadata": {
       "id": "zeffuro.fakegaming-torbox",
       "name": "Fakegaming TorBox Setup",
-      "description": "Friends-and-family TorBox configuration based on Tam-Taro's Complete SEL Setup. TMDB and TVDB are supplied by this AIOStreams instance; each user provides only their own TorBox account.",
+      "description": "Friends-and-family TorBox setup based on Tam-Taro's Complete SEL Setup. TMDB and TVDB are supplied by this AIOStreams instance. Each user supplies their own TorBox account. Torrentio is omitted because it blocks this server's outbound IP range.",
       "source": "external",
       "author": "TamTaro",
-      "version": "3.0.4",
+      "version": "3.0.401",
       "category": "TorBox",
       "serviceRequired": true,
       "inputs": [
@@ -3940,21 +3940,6 @@
                 "category": "HTTP"
               },
               {
-                "type": "torrentio",
-                "instanceId": "4ef",
-                "enabled": true,
-                "options": {
-                  "name": "Torrentio",
-                  "timeout": "{{inputs.includeAddon.timeout}}",
-                  "resources": [
-                    "stream"
-                  ],
-                  "providers": [],
-                  "useMultipleInstances": false
-                },
-                "category": "P2P"
-              },
-              {
                 "type": "webstreamr",
                 "instanceId": "645",
                 "enabled": true,
@@ -4212,21 +4197,6 @@
                 "name": "Knaben",
                 "timeout": "{{inputs.includeAddon.timeout}}",
                 "mediaTypes": [],
-                "useMultipleInstances": false
-              },
-              "category": "Debrid"
-            },
-            {
-              "type": "torrentio",
-              "instanceId": "4ef",
-              "enabled": true,
-              "options": {
-                "name": "Torrentio",
-                "timeout": "{{inputs.includeAddon.timeout}}",
-                "resources": [
-                  "stream"
-                ],
-                "providers": [],
                 "useMultipleInstances": false
               },
               "category": "Debrid"
