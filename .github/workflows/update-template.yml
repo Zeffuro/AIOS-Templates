@@ -1,0 +1,144 @@
+name: Update AIOStreams template
+
+on:
+  # Allows manual runs from the GitHub Actions page.
+  workflow_dispatch:
+
+  # Regenerate whenever the builder itself changes.
+  push:
+    branches:
+      - main
+    paths:
+      - build_template.py
+
+  # Check Tam-Taro for updates once per day at 04:23 UTC.
+  schedule:
+    - cron: "23 4 * * *"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: update-aiostreams-template
+  cancel-in-progress: false
+
+jobs:
+  update-template:
+    name: Generate and commit template
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+
+      - name: Generate customized template
+        run: python build_template.py
+
+      - name: Validate generated template
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          # Validate general JSON syntax.
+          python -m json.tool fakegaming-torbox.json > /dev/null
+
+          # Validate the important customizations.
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          output_path = Path("fakegaming-torbox.json")
+
+          if not output_path.is_file():
+              raise SystemExit(f"Missing generated file: {output_path}")
+
+          data = json.loads(output_path.read_text(encoding="utf-8"))
+          templates = data if isinstance(data, list) else [data]
+
+          template = next(
+              (
+                  item
+                  for item in templates
+                  if item.get("metadata", {}).get("id")
+                  == "zeffuro.fakegaming-torbox"
+              ),
+              None,
+          )
+
+          if template is None:
+              raise SystemExit(
+                  "Generated file does not contain "
+                  "'zeffuro.fakegaming-torbox'."
+              )
+
+          config = template.get("config", {})
+
+          # These must stay empty so AIOStreams uses the server-wide
+          # TMDB_API_KEY and TVDB_API_KEY environment variables.
+          for key in ("tmdbApiKey", "tvdbApiKey"):
+              value = config.get(key)
+              if value not in ("", None):
+                  raise SystemExit(
+                      f"{key} unexpectedly contains a value: {value!r}"
+                  )
+
+          metadata = template.get("metadata", {})
+          print(
+              "Validated template:",
+              metadata.get("name"),
+              metadata.get("version"),
+          )
+          PY
+
+      - name: Commit generated changes
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          # Only stage the generated template, never arbitrary repository files.
+          git add -- fakegaming-torbox.json
+
+          if git diff --cached --quiet; then
+            echo "The generated template has not changed."
+            exit 0
+          fi
+
+          TEMPLATE_VERSION="$(
+            python - <<'PY'
+          import json
+          from pathlib import Path
+
+          data = json.loads(
+              Path("fakegaming-torbox.json").read_text(encoding="utf-8")
+          )
+          templates = data if isinstance(data, list) else [data]
+
+          template = next(
+              item
+              for item in templates
+              if item.get("metadata", {}).get("id")
+              == "zeffuro.fakegaming-torbox"
+          )
+
+          print(template.get("metadata", {}).get("version", "unknown"))
+          PY
+          )"
+
+          git config user.name "github-actions[bot]"
+          git config \
+            user.email \
+            "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git commit \
+            -m "chore: update AIOStreams template (${TEMPLATE_VERSION})"
+
+          git push origin HEAD:main
