@@ -6,7 +6,7 @@
       "description": "Friends-and-family multi-service setup based on Tam-Taro's Complete SEL Setup. Users must select their own debrid/cloud service and provide their own credentials. TMDB/TVDB come from the server, Torrentio and unhealthy defaults are omitted, direct P2P is blocked, and dynamic fetching improves latency.",
       "source": "external",
       "author": "TamTaro",
-      "version": "3.2.503",
+      "version": "3.2.603",
       "category": "Debrid",
       "serviceRequired": true,
       "inputs": [
@@ -1127,6 +1127,24 @@
                   "label": "High — Strong boost"
                 }
               ]
+            },
+            {
+              "id": "subLevels",
+              "name": "For Nour: Sub Levels Boost",
+              "description": "Sub levels are how nekoBT attempts to categorize the quality of a release's subtitles. The higher the sub level (from L0 to L4), the more extensive the work put into the subtitles. **Default** prioritizes higher sub levels, boosting their SEL scores up to 500. Choose **None** to disable Sub Levels.",
+              "type": "select",
+              "required": false,
+              "default": "default",
+              "options": [
+                {
+                  "value": "default",
+                  "label": "Default - Boost Higher Sub Levels"
+                },
+                {
+                  "value": "none",
+                  "label": "None - Disable Sub Levels"
+                }
+              ]
             }
           ]
         },
@@ -1142,7 +1160,7 @@
           "__if": "services.torbox",
           "id": "torboxTier",
           "name": "TorBox Tier",
-          "description": "Apply a size cap to uncached downloads matching your TorBox subscription tier. Selecting Pro will auto-add Torbox Search (Usenet) functionality to your Meteor's config.",
+          "description": "Apply a size cap to uncached downloads matching your TorBox subscription tier. Note that Torbox Pro no longer has Usenet access.",
           "type": "select",
           "required": true,
           "advanced": false,
@@ -2424,7 +2442,7 @@
       "appliedTemplates": [
         {
           "id": "tamtaro.complete",
-          "version": "3.2.5"
+          "version": "3.2.6"
         }
       ],
       "addonName": {
@@ -2436,7 +2454,7 @@
         },
         "default": "{{inputs.misc.addonName}}"
       },
-      "addonDescription": "Custom AIOStreams powered by Tamtaro SEL Setup v3.2.5. Features advanced filtering with Stream Expression Language and smart sorting with Vidhin's Regex Patterns. Your personal all-in-one setup for the perfect Stremio experience.",
+      "addonDescription": "Custom AIOStreams powered by Tamtaro SEL Setup v3.2.6. Features advanced filtering with Stream Expression Language and smart sorting with Vidhin's Regex Patterns. Your personal all-in-one setup for the perfect Stremio experience.",
       "addonLogo": {
         "__switch": "inputs.misc.addonLogo",
         "cases": {
@@ -2922,6 +2940,12 @@
           "score": 0
         },
         {
+          "__if": "inputs.sorting.subLevels == default or inputs.sortingP2P.subLevels == default",
+          "pattern": "<SYNCED: https://git.tamtaro.de/for-nour-Regex.json>",
+          "name": "",
+          "score": 0
+        },
+        {
           "__if": "inputs.languages includes placeholder",
           "pattern": "https://raw.githubusercontent.com/Tam-Taro/SEL-Filtering-and-Sorting/refs/heads/main/AIOStreams-SyncedURLs/Tamtaro-synced-French-Regex.json",
           "name": "",
@@ -2930,6 +2954,12 @@
         {
           "__if": "inputs.languages includes placeholder]",
           "pattern": "https://raw.githubusercontent.com/Tam-Taro/SEL-Filtering-and-Sorting/refs/heads/main/AIOStreams-SyncedURLs/Tamtaro-synced-excluded-regex.json",
+          "name": "",
+          "score": 0
+        },
+        {
+          "__if": "inputs.languages includes placeholder]",
+          "pattern": "https://raw.githubusercontent.com/Tam-Taro/SEL-Filtering-and-Sorting/refs/heads/main/AIOStreams-SyncedURLs/Tamtaro-synced-for-nour-Regex.json",
           "name": "",
           "score": 0
         }
@@ -2952,6 +2982,12 @@
           "__if": "inputs.languages includes French",
           "__value": [
             "https://git.tamtaro.de/French-Regex.json"
+          ]
+        },
+        {
+          "__if": "inputs.sorting.subLevels == default or inputs.sortingP2P.subLevels == default",
+          "__value": [
+            "https://git.tamtaro.de/for-nour-Regex.json"
           ]
         }
       ],
@@ -3024,6 +3060,12 @@
           "__value": [
             "https://git.tamtaro.de/ESE.json"
           ]
+        },
+        {
+          "__if": "inputs.coreFilterNonUsenet includes placeholder",
+          "__value": [
+            "https://raw.githubusercontent.com/Tam-Taro/SEL-Filtering-and-Sorting/refs/heads/main/AIOStreams-SyncedURLs/Tamtaro-synced-for-nour-RSE.json"
+          ]
         }
       ],
       "syncedIncludedStreamExpressionUrls": [
@@ -3046,6 +3088,12 @@
           "__if": "inputs.languages includes French",
           "__value": [
             "https://git.tamtaro.de/French-RSE.json"
+          ]
+        },
+        {
+          "__if": "inputs.sorting.subLevels == default or inputs.sortingP2P.subLevels == default",
+          "__value": [
+            "https://git.tamtaro.de/for-nour-RSE.json"
           ]
         }
       ],
@@ -3099,17 +3147,17 @@
         },
         {
           "__if": "inputs.coreFilterNonUsenet > 0",
-          "expression": "/*𝚃𝚊𝚖𝚝𝚊𝚛𝚘 𝙲𝚘𝚖𝚙𝚕𝚎𝚝𝚎 𝚂𝙴𝙻 𝚂𝚎𝚝𝚞𝚙 𝚟3.2.5: 𝚂𝙴𝙻𝚎𝚌𝚝 {{inputs.coreFilterNonUsenet}} 𝙳𝚎𝚋𝚛𝚒𝚍·𝙷𝚃𝚃𝙿·𝙿2𝙿*/ []",
+          "expression": "/*𝚃𝚊𝚖𝚝𝚊𝚛𝚘 𝙲𝚘𝚖𝚙𝚕𝚎𝚝𝚎 𝚂𝙴𝙻 𝚂𝚎𝚝𝚞𝚙 𝚟3.2.6: 𝚂𝙴𝙻𝚎𝚌𝚝 {{inputs.coreFilterNonUsenet}} 𝙳𝚎𝚋𝚛𝚒𝚍·𝙷𝚃𝚃𝙿·𝙿2𝙿*/ []",
           "enabled": true
         },
         {
           "__if": "inputs.coreFilterUsenet > 0",
-          "expression": "/*𝚃𝚊𝚖𝚝𝚊𝚛𝚘 𝙲𝚘𝚖𝚙𝚕𝚎𝚝𝚎 𝚂𝙴𝙻 𝚂𝚎𝚝𝚞𝚙 𝚟3.2.5: 𝚂𝙴𝙻𝚎𝚌𝚝 {{inputs.coreFilterUsenet}} 𝚄𝚜𝚎𝚗𝚎𝚝*/ []",
+          "expression": "/*𝚃𝚊𝚖𝚝𝚊𝚛𝚘 𝙲𝚘𝚖𝚙𝚕𝚎𝚝𝚎 𝚂𝙴𝙻 𝚂𝚎𝚝𝚞𝚙 𝚟3.2.6: 𝚂𝙴𝙻𝚎𝚌𝚝 {{inputs.coreFilterUsenet}} 𝚄𝚜𝚎𝚗𝚎𝚝*/ []",
           "enabled": true
         },
         {
           "__if": "inputs.coreFilterUsenet == 0 and inputs.coreFilterUsenet == 0",
-          "expression": "/*𝚃𝚊𝚖𝚝𝚊𝚛𝚘 𝙲𝚘𝚖𝚙𝚕𝚎𝚝𝚎 𝚂𝙴𝙻 𝚂𝚎𝚝𝚞𝚙 𝚟3.2.5: No 𝚂𝙴𝙻𝚎𝚌𝚝 𝙴𝚗𝚐𝚒𝚗𝚎*/ []",
+          "expression": "/*𝚃𝚊𝚖𝚝𝚊𝚛𝚘 𝙲𝚘𝚖𝚙𝚕𝚎𝚝𝚎 𝚂𝙴𝙻 𝚂𝚎𝚝𝚞𝚙 𝚟3.2.6: No 𝚂𝙴𝙻𝚎𝚌𝚝 𝙴𝚗𝚐𝚒𝚗𝚎*/ []",
           "enabled": true
         },
         {
@@ -3612,6 +3660,18 @@
           {
             "__if": "inputs.languages includes German",
             "expression": "<SYNCED: https://raw.githubusercontent.com/Vidhin05/Releases-Regex/main/German/expressions.json>",
+            "score": 0,
+            "enabled": true
+          },
+          {
+            "__if": "inputs.sorting.subLevels == default or inputs.sortingP2P.subLevels == default",
+            "expression": "/*#𝙵𝚘𝚛 𝙽𝚘𝚞𝚛: 𝙰𝚗𝚒𝚖𝚎 𝚂𝚞𝚋 𝙻𝚎𝚟𝚎𝚕𝚜 𝚟1.0.0 [𝚐𝚒𝚝.𝚝𝚊𝚖𝚝𝚊𝚛𝚘.𝚍𝚎]*/ []",
+            "score": 0,
+            "enabled": true
+          },
+          {
+            "__if": "inputs.sorting.subLevels == default or inputs.sortingP2P.subLevels == default",
+            "expression": "<SYNCED: https://git.tamtaro.de/for-nour-RSE.json>",
             "score": 0,
             "enabled": true
           }
@@ -4400,7 +4460,8 @@
                 "mediaTypes": [
                   "anime"
                 ],
-                "useMultipleInstances": false
+                "useMultipleInstances": false,
+                "leaveAutoTitleTagsInFilename": true
               },
               "category": "Debrid"
             },
@@ -5108,30 +5169,58 @@
             "script": "# Nuvio P2P Instant Variant. Inserts p2p-only scrapers, switches to \"Tamtaro (Nuvio P2P Instant)\" formatter, strips debrid/usenet/http services and addons, and disables seeder-specific filter & sorting.\n\nset addonName = \"AIOStreams (Instant)\"\nuse formatter \"Tamtaro (Nuvio P2P Instant)\"\nset excludedStreamTypes = [\"usenet\",\"stremio-usenet\",\"http\",\"live\"]\ndisable excludedStreamExpressions[expression*=\"P2P Backup\"]\ndisable services[*]\nremove sortCriteria.global[key=seeders]\nremove sortCriteria.cached[key=seeders]\nremove sortCriteria.uncached[key=seeders]\nadd selOverrides {\"expression\": \"[]\", \"exprNames\": [\"Low Seeders\"], \"disabled\": true}\ndisable presets[type=library]\ndisable presets[type=stremthruStore]\ndisable presets[type=neko-bt]\ndisable presets[type=anime-tosho-new]\ndisable presets[type=animetosho]\ndisable presets[type=torznab]\ndisable presets[type=newznab]\ndisable presets[type=knaben]\ndisable presets[type=zilean]\ndisable presets[type=seadex]\ndisable presets[type=knaben]\ndisable presets[type=debridio]\ndisable presets[type=easynews-search]\ndisable presets[type=easynews]\ndisable presets[type=easynewsPlus]\ndisable presets[type=easynewsPlusPlus]\ndisable presets[type=nzbhydra]\ndisable presets[type=usenet-streamer]\ndisable presets[type=streamnzb]\ndisable presets[type=davex]\ndisable presets[type=sootio]\ndisable presets[type=webstreamr]\ndisable presets[type=yastream]\ndisable presets[type=stremthruStore]\ndisable presets[type=torrentio]\ndisable presets[type=meteor]\ndisable presets[type=comet]\ndisable presets[type=stremthruTorz]\ndisable presets[type=mediafusion]\ndisable presets[type=torrents-db]\ndisable presets[type=peerflix]\ndisable presets[type=sootio]\nremove presets[*].options.httpProviders\ndisable presets[type=yastream]\ndisable presets[type=hdhub]\ndisable presets[type=webstreamr]\nprepend presets\n  { \"type\": \"meteor\", \"instanceId\": \"064p2p\", \"enabled\": true, \"options\": { \"name\": \"Meteor\", \"timeout\": {{inputs.includeAddon.timeout}}, \"resources\": [\"stream\"], \"removeTrash\": false, \"useMultipleInstances\": false, \"mediaTypes\": [] }, \"category\": \"P2P\" },\n  { \"type\": \"comet\", \"instanceId\": \"b0fp2p\", \"enabled\": true, \"options\": { \"name\": \"Comet\", \"timeout\": {{inputs.includeAddon.timeout}}, \"resources\": [\"stream\"], \"removeTrash\": false, \"mediaTypes\": [], \"url\": \"\" }, \"category\": \"P2P\" },\n  { \"type\": \"stremthruTorz\", \"instanceId\": \"bb9p2p\", \"enabled\": true, \"options\": { \"name\": \"STorz\", \"timeout\": {{inputs.includeAddon.timeout}}, \"resources\": [\"stream\"], \"mediaTypes\": [], \"includeP2P\": true, \"useMultipleInstances\": false, \"url\": \"\" }, \"category\": \"P2P\" },\n  { \"type\": \"torrentio\", \"instanceId\": \"4efp2p\", \"enabled\": true, \"options\": { \"name\": \"Torrentio\", \"timeout\": {{inputs.includeAddon.timeout}}, \"resources\": [\"stream\"], \"providers\": [], \"useMultipleInstances\": false }, \"category\": \"P2P\" },\n  { \"type\": \"mediafusion\", \"instanceId\": \"276p2p\", \"enabled\": true, \"options\": { \"name\": \"MediaFusion\", \"timeout\": {{inputs.includeAddon.timeout}}, \"resources\": [\"stream\"], \"useCachedResultsOnly\": true, \"enableWatchlistCatalogs\": false, \"downloadViaBrowser\": false, \"contributorStreams\": false, \"certificationLevelsFilter\": [], \"nudityFilter\": [], \"mediaTypes\": [], \"url\": \"\" }, \"category\": \"P2P\" },\n  { \"type\": \"torrents-db\", \"instanceId\": \"a15p2p\", \"enabled\": true, \"options\": { \"name\": \"TorrentsDB\", \"timeout\": {{inputs.includeAddon.timeout}}, \"resources\": [\"stream\"], \"mediaTypes\": [], \"providers\": [], \"includeP2P\": true, \"useMultipleInstances\": false }, \"category\": \"P2P\" },\n  { \"type\": \"peerflix\", \"instanceId\": \"8b6p2p\", \"enabled\": true, \"options\": { \"name\": \"Peerflix\", \"timeout\": {{inputs.includeAddon.timeout}}, \"resources\": [\"stream\"], \"mediaTypes\": [], \"useMultipleInstances\": false, \"showTorrentLinks\": true }, \"category\": \"P2P\" }"
           },
           {
-            "__if": "services.torbox",
+            "__if": "services.torbox and !inputs.includeAddon.p2pAddons",
             "id": "torbox-down",
             "script": "# Auto-activates whenever Torbox is down. This variant disables Torbox service in your base config and auto-switches to fallback services. Ignore if you do not have Torbox service.\n\ndisable services[id=torbox]\nremove presets[*].options.services[=\"torbox\"]\nset excludedStreamTypes = [\"p2p\"]",
             "name": "Torbox Down",
             "when": "health('torbox-down')"
           },
           {
-            "__if": "services.realdebrid",
+            "__if": "services.realdebrid and !inputs.includeAddon.p2pAddons",
             "id": "realdebrid-down",
             "script": "# Auto-activates whenever RealDebrid is down. This variant disables RealDebrid service in your base config and auto-switches to fallback services. Ignore if you do not have RealDebrid service.\n\ndisable services[id=realdebrid]\nremove presets[*].options.services[=\"realdebrid\"]\nset excludedStreamTypes = [\"p2p\"]",
             "name": "RealDebrid Down",
             "when": "health('realdebrid-down')"
           },
           {
-            "__if": "services.premiumize",
+            "__if": "services.premiumize and !inputs.includeAddon.p2pAddons",
             "id": "premiumize-down",
             "script": "# Auto-activates whenever Premiumize is down. This variant disables Premiumize service in your base config and auto-switches to fallback services. Ignore if you do not have Premiumize service.\n\ndisable services[id=premiumize]\nremove presets[*].options.services[=\"premiumize\"]\nset excludedStreamTypes = [\"p2p\"]",
             "name": "Premiumize Down",
             "when": "health('premiumize-down')"
           },
           {
-            "__if": "services.torrin",
+            "__if": "services.torrin and !inputs.includeAddon.p2pAddons",
             "id": "torrin-down",
             "script": "# Auto-activates whenever Torrin is down. This variant disables Torrin service in your base config and auto-switches to fallback services. Ignore if you do not have Torrin service.\n\ndisable services[id=torrin]\nremove presets[*].options.services[=\"torrin\"]\nset excludedStreamTypes = [\"p2p\"]",
+            "name": "Torrin Down",
+            "when": "health('torrin-down')"
+          },
+          {
+            "__if": "services.torbox and inputs.includeAddon.p2pAddons",
+            "id": "torbox-down",
+            "script": "# Auto-activates whenever Torbox is down. This variant disables Torbox service in your base config and auto-switches to fallback services. Ignore if you do not have Torbox service.\n\ndisable services[id=torbox]\nremove presets[*].options.services[=\"torbox\"]",
+            "name": "Torbox Down",
+            "when": "health('torbox-down')"
+          },
+          {
+            "__if": "services.realdebrid and inputs.includeAddon.p2pAddons",
+            "id": "realdebrid-down",
+            "script": "# Auto-activates whenever RealDebrid is down. This variant disables RealDebrid service in your base config and auto-switches to fallback services. Ignore if you do not have RealDebrid service.\n\ndisable services[id=realdebrid]\nremove presets[*].options.services[=\"realdebrid\"]",
+            "name": "RealDebrid Down",
+            "when": "health('realdebrid-down')"
+          },
+          {
+            "__if": "services.premiumize and inputs.includeAddon.p2pAddons",
+            "id": "premiumize-down",
+            "script": "# Auto-activates whenever Premiumize is down. This variant disables Premiumize service in your base config and auto-switches to fallback services. Ignore if you do not have Premiumize service.\n\ndisable services[id=premiumize]\nremove presets[*].options.services[=\"premiumize\"]",
+            "name": "Premiumize Down",
+            "when": "health('premiumize-down')"
+          },
+          {
+            "__if": "services.torrin and inputs.includeAddon.p2pAddons",
+            "id": "torrin-down",
+            "script": "# Auto-activates whenever Torrin is down. This variant disables Torrin service in your base config and auto-switches to fallback services. Ignore if you do not have Torrin service.\n\ndisable services[id=torrin]\nremove presets[*].options.services[=\"torrin\"]",
             "name": "Torrin Down",
             "when": "health('torrin-down')"
           }
