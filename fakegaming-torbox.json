@@ -6,7 +6,7 @@
       "description": "Friends-and-family multi-service setup based on Tam-Taro's Complete SEL Setup. Users must select their own debrid/cloud service and provide their own credentials. TMDB/TVDB come from the server, Torrentio and unhealthy defaults are omitted, direct P2P is blocked, and dynamic fetching improves latency.",
       "source": "external",
       "author": "TamTaro",
-      "version": "3.2.703",
+      "version": "3.2.803",
       "category": "Debrid",
       "serviceRequired": true,
       "inputs": [
@@ -2342,10 +2342,10 @@
             {
               "id": "addonName",
               "name": "Add-on Name",
-              "description": "What to call AIOStreams in Stremio?",
+              "description": "What to call AIOStreams addon?",
               "type": "select-with-custom",
               "required": false,
-              "default": "AIOStreams",
+              "default": "SELection",
               "options": [
                 {
                   "value": "AIOStreams",
@@ -2453,7 +2453,7 @@
       "appliedTemplates": [
         {
           "id": "tamtaro.complete",
-          "version": "3.2.7"
+          "version": "3.2.8"
         }
       ],
       "addonName": {
@@ -2465,7 +2465,7 @@
         },
         "default": "{{inputs.misc.addonName}}"
       },
-      "addonDescription": "Custom AIOStreams powered by Tamtaro SEL Setup v3.2.7. Features advanced filtering with Stream Expression Language and smart sorting with Vidhin's Regex Patterns. Your personal all-in-one setup for the perfect Stremio experience.",
+      "addonDescription": "Custom AIOStreams powered by Tamtaro SEL Setup v3.2.8. Features advanced filtering with Stream Expression Language and smart sorting with Vidhin's Regex Patterns. Your personal all-in-one setup for the perfect streaming experience.",
       "addonLogo": {
         "__switch": "inputs.misc.addonLogo",
         "cases": {
@@ -2998,7 +2998,7 @@
         {
           "__if": "inputs.languages includes placeholder",
           "__value": [
-            "https://raw.githubusercontent.com/Tam-Taro/SEL-Filtering-and-Sorting/refs/heads/main/AIOStreams-SyncedURLs/Tamtaro-synced-french-Regex.json"
+            "https://raw.githubusercontent.com/Tam-Taro/SEL-Filtering-and-Sorting/refs/heads/main/AIOStreams-SyncedURLs/Tamtaro-synced-french-regex.json"
           ]
         }
       ],
@@ -3158,17 +3158,17 @@
         },
         {
           "__if": "inputs.coreFilterNonUsenet > 0",
-          "expression": "/*𝚃𝚊𝚖𝚝𝚊𝚛𝚘 𝙲𝚘𝚖𝚙𝚕𝚎𝚝𝚎 𝚂𝙴𝙻 𝚂𝚎𝚝𝚞𝚙 𝚟3.2.7: 𝚂𝙴𝙻𝚎𝚌𝚝 {{inputs.coreFilterNonUsenet}} 𝙳𝚎𝚋𝚛𝚒𝚍·𝙷𝚃𝚃𝙿·𝙿2𝙿*/ []",
+          "expression": "/*𝚃𝚊𝚖𝚝𝚊𝚛𝚘 𝙲𝚘𝚖𝚙𝚕𝚎𝚝𝚎 𝚂𝙴𝙻 𝚂𝚎𝚝𝚞𝚙 𝚟3.2.8: 𝚂𝙴𝙻𝚎𝚌𝚝 {{inputs.coreFilterNonUsenet}} 𝙳𝚎𝚋𝚛𝚒𝚍·𝙷𝚃𝚃𝙿·𝙿2𝙿*/ []",
           "enabled": true
         },
         {
           "__if": "inputs.coreFilterUsenet > 0",
-          "expression": "/*𝚃𝚊𝚖𝚝𝚊𝚛𝚘 𝙲𝚘𝚖𝚙𝚕𝚎𝚝𝚎 𝚂𝙴𝙻 𝚂𝚎𝚝𝚞𝚙 𝚟3.2.7: 𝚂𝙴𝙻𝚎𝚌𝚝 {{inputs.coreFilterUsenet}} 𝚄𝚜𝚎𝚗𝚎𝚝*/ []",
+          "expression": "/*𝚃𝚊𝚖𝚝𝚊𝚛𝚘 𝙲𝚘𝚖𝚙𝚕𝚎𝚝𝚎 𝚂𝙴𝙻 𝚂𝚎𝚝𝚞𝚙 𝚟3.2.8: 𝚂𝙴𝙻𝚎𝚌𝚝 {{inputs.coreFilterUsenet}} 𝚄𝚜𝚎𝚗𝚎𝚝*/ []",
           "enabled": true
         },
         {
           "__if": "inputs.coreFilterUsenet == 0 and inputs.coreFilterUsenet == 0",
-          "expression": "/*𝚃𝚊𝚖𝚝𝚊𝚛𝚘 𝙲𝚘𝚖𝚙𝚕𝚎𝚝𝚎 𝚂𝙴𝙻 𝚂𝚎𝚝𝚞𝚙 𝚟3.2.7: No 𝚂𝙴𝙻𝚎𝚌𝚝 𝙴𝚗𝚐𝚒𝚗𝚎*/ []",
+          "expression": "/*𝚃𝚊𝚖𝚝𝚊𝚛𝚘 𝙲𝚘𝚖𝚙𝚕𝚎𝚝𝚎 𝚂𝙴𝙻 𝚂𝚎𝚝𝚞𝚙 𝚟3.2.8: No 𝚂𝙴𝙻𝚎𝚌𝚝 𝙴𝚗𝚐𝚒𝚗𝚎*/ []",
           "enabled": true
         },
         {
@@ -5198,7 +5198,7 @@
           },
           {
             "id": "http-only",
-            "script": "# HTTP Only Variant. Disables all debrid/usenet/p2p related services and addons from your base config. Ensure you have HTTP addons in your base config, either by adding them from the Marketplace yourself, or by toggling \"Includes HTTP Addons\" inside SEL template's Preset Modification window.\n\nset addonName = \"AIOStreams (HTTP Only)\"\nset excludedStreamTypes = [\"usenet\",\"stremio-usenet\",\"debrid\",\"p2p\"]\ndisable excludedStreamExpressions[expression*=\"HTTP Backup\"]\nremove presets[*].options.services\ndisable services[id=aiostreams]\ndisable services[id=nzbdav]\ndisable services[id=altmount]\ndisable services[id=easynews]\ndisable services[id=stremio_nntp]\ndisable services[id=stremthru_newz]\ndisable presets[type=library]\ndisable presets[type=stremthruStore]\ndisable presets[type=newznab]\ndisable presets[type=easynews-search]\ndisable presets[type=easynews]\ndisable presets[type=easynewsPlus]\ndisable presets[type=easynewsPlusPlus]\ndisable presets[type=nzbhydra]\ndisable presets[type=usenet-streamer]\ndisable presets[type=streamnzb]\ndisable presets[type=davex]\ndisable presets[type=neko-bt]\ndisable presets[type=anime-tosho-new]\ndisable presets[type=animetosho]\ndisable presets[type=torznab]\ndisable presets[type=knaben]\ndisable presets[type=zilean]\ndisable presets[type=seadex]\ndisable presets[type=knaben]\ndisable presets[type=debridio]\ndisable presets[type=stremthruStore]\ndisable presets[type=torrentio]\ndisable presets[type=meteor]\ndisable presets[type=comet]\ndisable presets[type=stremthruTorz]\ndisable presets[type=mediafusion]\ndisable presets[type=torrents-db]\ndisable presets[type=peerflix]\ndisable presets[type=newznab]\ndisable presets[type=easynews-search]\ndisable presets[type=easynews]\ndisable presets[type=easynewsPlus]\ndisable presets[type=easynewsPlusPlus]\ndisable presets[type=nzbhydra]\ndisable presets[type=usenet-streamer]\ndisable presets[type=streamnzb]\ndisable presets[type=davex]",
+            "script": "# HTTP Only Variant. Disables all debrid/usenet/p2p related services and addons from your base config. Ensure you have HTTP addons in your base config, either by adding them from the Marketplace yourself, or by toggling \"Includes HTTP Addons\" inside SEL template's Preset Modification window.\n\nset addonName = \"AIOStreams (HTTP Only)\"\nset excludedStreamTypes = [\"usenet\",\"stremio-usenet\",\"debrid\",\"p2p\"]\ndisable excludedStreamExpressions[expression*=\"HTTP Backup\"]\ndisable excludedStreamExpressions[expression*=\"Cached Non-Usenet\"]\nremove presets[*].options.services\ndisable services[id=aiostreams]\ndisable services[id=nzbdav]\ndisable services[id=altmount]\ndisable services[id=easynews]\ndisable services[id=stremio_nntp]\ndisable services[id=stremthru_newz]\ndisable presets[type=library]\ndisable presets[type=stremthruStore]\ndisable presets[type=newznab]\ndisable presets[type=easynews-search]\ndisable presets[type=easynews]\ndisable presets[type=easynewsPlus]\ndisable presets[type=easynewsPlusPlus]\ndisable presets[type=nzbhydra]\ndisable presets[type=usenet-streamer]\ndisable presets[type=streamnzb]\ndisable presets[type=davex]\ndisable presets[type=neko-bt]\ndisable presets[type=anime-tosho-new]\ndisable presets[type=animetosho]\ndisable presets[type=torznab]\ndisable presets[type=knaben]\ndisable presets[type=zilean]\ndisable presets[type=seadex]\ndisable presets[type=knaben]\ndisable presets[type=debridio]\ndisable presets[type=stremthruStore]\ndisable presets[type=torrentio]\ndisable presets[type=meteor]\ndisable presets[type=comet]\ndisable presets[type=stremthruTorz]\ndisable presets[type=mediafusion]\ndisable presets[type=torrents-db]\ndisable presets[type=peerflix]\ndisable presets[type=newznab]\ndisable presets[type=easynews-search]\ndisable presets[type=easynews]\ndisable presets[type=easynewsPlus]\ndisable presets[type=easynewsPlusPlus]\ndisable presets[type=nzbhydra]\ndisable presets[type=usenet-streamer]\ndisable presets[type=streamnzb]\ndisable presets[type=davex]",
             "name": "HTTP Only"
           },
           {
